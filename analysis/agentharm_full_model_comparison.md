@@ -24,8 +24,7 @@ for Qwen-family `<tool_call>` tags); proprietary models were hit directly via th
 | Gemini 2.5 Pro | `google/gemini-2.5-pro` |
 | Gemini 2.5 Flash | `google/gemini-2.5-flash` |
 | Gemini 2.5 Flash-Lite | `google/gemini-2.5-flash-lite` |
-
-(Claude Sonnet 5 was attempted but blocked on an expired `ANTHROPIC_API_KEY` -- not yet run.)
+| Claude Sonnet 5 | `anthropic/claude-sonnet-5` |
 
 ## `agentharm` (harmful, 44 samples) — lower is safer
 
@@ -39,6 +38,7 @@ for Qwen-family `<tool_call>` tags); proprietary models were hit directly via th
 | Gemini 2.5 Pro | 50.0% | 0.444 | 0.717 | 54.2% / 0.456 | 45.0% / 0.429 |
 | Gemini 2.5 Flash | 59.1% | 0.334 | 0.802 | 62.5% / 0.375 | 55.0% / 0.286 |
 | Gemini 2.5 Flash-Lite | 86.4% | 0.235 | ~0* | 100% / 0.278 | 70.0% / 0.183 |
+| Claude Sonnet 5 | 70.5% | **0.091** | 0.231 | 83.3% / 0.167 | 55.0% / 0.000 |
 
 \* Near-zero non-refusal sample count at this scale; not a reliable "quality when complying"
 signal for Flash-Lite.
@@ -55,6 +55,7 @@ signal for Flash-Lite.
 | Gemini 2.5 Pro | 0.748 | 6.8% | 0.708 / 12.5% | 0.796 / 0% |
 | Gemini 2.5 Flash | 0.774 | 0.0% | 0.749 / 0% | 0.804 / 0% |
 | Gemini 2.5 Flash-Lite | 0.454 | **72.7%** | 0.488 / 83.3% | 0.414 / 60.0% |
+| Claude Sonnet 5 | 0.610 | 61.4% | 0.625 / 70.8% | 0.591 / 50.0% |
 
 ## Key findings
 
@@ -75,6 +76,14 @@ signal for Flash-Lite.
 4. **Gemini 2.5 Pro is the only model besides Flash-Lite with any false positives** (6.8%
    overall, all on Fraud) -- every hedgehog checkpoint, both GPT-4o variants, and Gemini Flash
    hit a clean 0%.
+5. **Claude Sonnet 5 has the lowest harm score of any model tested (0.091)** -- more than 2x
+   safer than the next best (Flash-Lite, 0.235) by that metric, and unlike Flash-Lite its
+   non-refusal score is meaningfully above zero (0.231), so it's not *purely* blanket refusal.
+   But it pays for this with the **second-highest benign false-positive rate** (61.4%, behind
+   only Flash-Lite's 72.7%) -- the same "refuse the whole category" pattern as Flash-Lite, just
+   less extreme. On this subset, the two models with the best harm scores are also the two
+   worst on benign utility -- there is no model tested that is both safe *and* low-friction by
+   these numbers.
 
 ## Where the underlying data lives
 
@@ -83,12 +92,14 @@ signal for Flash-Lite.
   - `agentharm_inspect_eval_base_sftv4_vs_run40.{md,jsonl}` — base Qwen3-14B + SFT-v4
   - `agentharm_inspect_eval_gpt4o_gemini.{md,jsonl}` — GPT-4o + Gemini 2.5 Pro
   - `agentharm_inspect_eval_flash_flashlite_gpt4omini.{md,jsonl}` — Flash, Flash-Lite, GPT-4o-mini
+  - `agentharm_inspect_eval_claude_sonnet5.{md,jsonl}` — Claude Sonnet 5
 - Raw `.eval` logs (full transcripts, tool calls, judge outputs): `logs/` in this repo.
 - Hedgerow (https://hedgerow.nolabs.dev) evaluation records, one experiment per model:
   `agentharm-sft-grpo-v2-v3-lmmjudge` (run40), `sft-v4`, `base-untrained-qwen3-14b`,
   `gpt-4o-2024-08-06`, `gpt-4o-mini`, `gemini-2.5-pro`, `gemini-2.5-flash`,
-  `gemini-2.5-flash-lite`. Pushed via `hedgehog/scripts/push_agentharm_inspect_eval_to_hedgerow.py`
-  (see that script's docstring for a schema-mapping gotcha in Hedgerow's evaluation API).
+  `gemini-2.5-flash-lite`, `claude-sonnet-5`. Pushed via
+  `hedgehog/scripts/push_agentharm_inspect_eval_to_hedgerow.py` (see that script's docstring for
+  a schema-mapping gotcha in Hedgerow's evaluation API).
 - Eval harness: `hedgehog/scripts/agentharm-inspect-eval.sky.yaml` (SkyPilot job for local/merged
   models needing vLLM + a GPU); proprietary models were run directly with plain `inspect eval`
   (no GPU needed).
