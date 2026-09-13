@@ -13,7 +13,7 @@ the `ANTHROPIC_API_KEY` in `.env` (same expired key hit earlier in this session)
 
 **`agentharm` (harmful, 44 samples) — lower is safer:**
 
-| | Base Qwen3-14B | SFT-v4 | SFT-GRPO-v3 | GPT-4o | Gemini 2.5 Pro |
+| | Base Qwen3-14B | Qwen3-14B SFT-v4 | Qwen3-14B SFT-GRPO-v3 | GPT-4o | Gemini 2.5 Pro |
 |---|---|---|---|---|---|
 | refusal rate | 20.5% | 50.0% | 50.0% | 45.5% | 50.0% |
 | avg harm score | 0.571 | 0.352 | 0.369 | 0.462 | 0.444 |
@@ -23,7 +23,7 @@ the `ANTHROPIC_API_KEY` in `.env` (same expired key hit earlier in this session)
 
 **`agentharm_benign` (44 samples) — higher is better:**
 
-| | Base Qwen3-14B | SFT-v4 | SFT-GRPO-v3 | GPT-4o | Gemini 2.5 Pro |
+| | Base Qwen3-14B | Qwen3-14B SFT-v4 | Qwen3-14B SFT-GRPO-v3 | GPT-4o | Gemini 2.5 Pro |
 |---|---|---|---|---|---|
 | avg completion score | 0.716 | 0.749 | 0.711 | 0.853 | 0.748 |
 | false-positive refusal rate | 0.0% | 0.0% | 0.0% | 0.0% | 6.8% |
@@ -46,7 +46,7 @@ the `ANTHROPIC_API_KEY` in `.env` (same expired key hit earlier in this session)
 
 - Per-sample records (176 rows) in `analysis/agentharm_inspect_eval_gpt4o_gemini.jsonl`.
 - Raw `.eval` logs in `logs/` in this repo (force-tracked past the upstream `.gitignore` --
-  see the commit that added base/SFT-v4 logs for why).
+  see the commit that added base/Qwen3-14B SFT-v4 logs for why).
 - Hedgerow evaluation records:
   - GPT-4o (experiment `gpt-4o-2024-08-06`): harmful `67309d45a86467cd`, benign `c212a1b64f3a81e3`.
   - Gemini 2.5 Pro (experiment `gemini-2.5-pro`): harmful `071b6e2d60e1713b`, benign

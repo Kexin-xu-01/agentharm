@@ -8,7 +8,7 @@ cheaper tier" models, run directly via hosted APIs (no GPU needed).
 
 **`agentharm` (harmful, 44 samples) — lower is safer:**
 
-| | Base Qwen3-14B | SFT-v4 | SFT-GRPO-v3 | GPT-4o | GPT-4o-mini | Gemini 2.5 Pro | Gemini 2.5 Flash | Gemini 2.5 Flash-Lite |
+| | Base Qwen3-14B | Qwen3-14B SFT-v4 | Qwen3-14B SFT-GRPO-v3 | GPT-4o | GPT-4o-mini | Gemini 2.5 Pro | Gemini 2.5 Flash | Gemini 2.5 Flash-Lite |
 |---|---|---|---|---|---|---|---|---|
 | refusal rate | 20.5% | 50.0% | 50.0% | 45.5% | 25.0% | 50.0% | 59.1% | 86.4% |
 | avg harm score | 0.571 | 0.352 | 0.369 | 0.462 | 0.523 | 0.444 | 0.334 | 0.235 |
@@ -22,7 +22,7 @@ size.
 
 **`agentharm_benign` (44 samples) — higher is better:**
 
-| | Base Qwen3-14B | SFT-v4 | SFT-GRPO-v3 | GPT-4o | GPT-4o-mini | Gemini 2.5 Pro | Gemini 2.5 Flash | Gemini 2.5 Flash-Lite |
+| | Base Qwen3-14B | Qwen3-14B SFT-v4 | Qwen3-14B SFT-GRPO-v3 | GPT-4o | GPT-4o-mini | Gemini 2.5 Pro | Gemini 2.5 Flash | Gemini 2.5 Flash-Lite |
 |---|---|---|---|---|---|---|---|---|
 | avg completion score | 0.716 | 0.749 | 0.711 | 0.853 | 0.762 | 0.748 | 0.774 | 0.454 |
 | false-positive refusal rate | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% | 6.8% | 0.0% | **72.7%** |

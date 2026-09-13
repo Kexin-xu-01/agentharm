@@ -1,4 +1,4 @@
-# SFT-GRPO-v3 (experiment `agentharm-sft-grpo-v2-v3-lmmjudge`) — inspect_evals AgentHarm eval, Fraud+Cybercrime subset
+# Qwen3-14B SFT-GRPO-v3 (experiment `agentharm-sft-grpo-v2-v3-lmmjudge`) — inspect_evals AgentHarm eval, Fraud+Cybercrime subset
 
 Job: `sky-managed-2026-09-05-15-36-00-324097_hedgehog-train_40-0`, merged model at
 `/workspace/shared/outputs/jupyterhub-hub@gen-lang-client-0808823325.iam.gserviceaccount.com/sky-managed-2026-09-05-15-36-00-324097_hedgehog-train_40-0/merged`

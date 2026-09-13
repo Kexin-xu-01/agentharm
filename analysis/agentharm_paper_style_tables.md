@@ -22,8 +22,8 @@ tables and figures mirror the paper's *presentation*, not its published numbers.
 | Claude Sonnet 5 | 0.091 | 70.5% | 0.231 | 0.610 |
 | Gemini 2.5 Flash-Lite | 0.235 | 86.4% | ~0* | 0.454 |
 | Gemini 2.5 Flash | 0.334 | 59.1% | 0.802 | 0.774 |
-| SFT-v4 | 0.352 | 50.0% | 0.705 | 0.749 |
-| SFT-GRPO-v3 | 0.369 | 50.0% | 0.707 | 0.711 |
+| Qwen3-14B SFT-v4 | 0.352 | 50.0% | 0.705 | 0.749 |
+| Qwen3-14B SFT-GRPO-v3 | 0.369 | 50.0% | 0.707 | 0.711 |
 | Gemini 2.5 Pro | 0.444 | 50.0% | 0.717 | 0.748 |
 | GPT-4o | 0.462 | 45.5% | 0.807 | 0.853 |
 | GPT-4o-mini | 0.523 | 25.0% | 0.631 | 0.762 |
@@ -42,8 +42,8 @@ Harm Score by category, all models:
 | Model | Fraud | Cybercrime |
 |---|---|---|
 | Base Qwen3-14B | 0.532 | 0.617 |
-| SFT-v4 | 0.396 | 0.300 |
-| SFT-GRPO-v3 | 0.444 | 0.279 |
+| Qwen3-14B SFT-v4 | 0.396 | 0.300 |
+| Qwen3-14B SFT-GRPO-v3 | 0.444 | 0.279 |
 | GPT-4o | 0.426 | 0.504 |
 | GPT-4o-mini | 0.491 | 0.561 |
 | Gemini 2.5 Pro | 0.456 | 0.429 |
@@ -56,8 +56,8 @@ Refusal Rate by category, all models:
 | Model | Fraud | Cybercrime |
 |---|---|---|
 | Base Qwen3-14B | 25.0% | 15.0% |
-| SFT-v4 | 41.7% | 60.0% |
-| SFT-GRPO-v3 | 41.7% | 60.0% |
+| Qwen3-14B SFT-v4 | 41.7% | 60.0% |
+| Qwen3-14B SFT-GRPO-v3 | 41.7% | 60.0% |
 | GPT-4o | 45.8% | 45.0% |
 | GPT-4o-mini | 20.8% | 30.0% |
 | Gemini 2.5 Pro | 54.2% | 45.0% |
@@ -71,7 +71,7 @@ same framing applied to our own before/after-training pair:
 
 ![Category breakdown: GPT-4o-mini vs GPT-4o](plots/category_breakdown_gpt4o_family.png)
 
-![Category breakdown: Base Qwen3-14B vs SFT-GRPO-v3](plots/category_breakdown_base_vs_sftgrpov3.png)
+![Category breakdown: Base Qwen3-14B vs Qwen3-14B SFT-GRPO-v3](plots/category_breakdown_base_vs_sftgrpov3.png)
 
 Note the direction flips between categories for the GPT-4o pair: GPT-4o-mini has a *higher*
 harm score than GPT-4o on both Fraud and Cybercrime here, opposite to the paper's finding that
