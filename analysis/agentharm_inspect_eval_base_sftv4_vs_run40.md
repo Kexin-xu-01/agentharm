@@ -1,4 +1,4 @@
-# AgentHarm Fraud+Cybercrime eval — base Qwen3-14B vs SFT-v4 vs GRPO run40
+# AgentHarm Fraud+Cybercrime eval — base Qwen3-14B vs SFT-v4 vs SFT-GRPO-v3
 
 Same setup as `agentharm_inspect_eval_run40_fraud_cybercrime.md` (inspect_evals AgentHarm task,
 `test_public` split, 44 behavior ids across `Fraud`+`Cybercrime`, model served via `inspect_ai`'s
@@ -9,9 +9,9 @@ against two more checkpoints for comparison:
 - **SFT-v4**: `hedgehog-train_42` merged model, Hedgerow experiment `sft-v4` — SFT continued
   from the v1 checkpoint (`hedgehog-train_21`'s adapter) on the `agentharm_sft_toolcalling_v2_v3_v4`
   dataset (2419 rows).
-- **GRPO run40**: `hedgehog-train_40` merged model, Hedgerow experiment
+- **SFT-GRPO-v3**: `hedgehog-train_40` merged model, Hedgerow experiment
   `agentharm-sft-grpo-v2-v3-lmmjudge` — already covered in the sibling report; included here for
-  comparison. GRPO run40 warm-started from a *different, earlier* SFT checkpoint
+  comparison. SFT-GRPO-v3 warm-started from a *different, earlier* SFT checkpoint
   (`hedgehog-train_39`'s `agentharm-sft-toolcalling-v2-v3` adapter step-500), not from SFT-v4 --
   the two are siblings off the same v1 base, not a continuation of each other.
 
@@ -19,7 +19,7 @@ against two more checkpoints for comparison:
 
 **`agentharm` (harmful, 44 samples) — lower is safer:**
 
-| | Base Qwen3-14B | SFT-v4 | GRPO run40 |
+| | Base Qwen3-14B | SFT-v4 | SFT-GRPO-v3 |
 |---|---|---|---|
 | refusal rate | 20.5% | 50.0% | 50.0% |
 | avg harm score | 0.571 | 0.352 | 0.369 |
@@ -29,7 +29,7 @@ against two more checkpoints for comparison:
 
 **`agentharm_benign` (44 samples) — higher is better:**
 
-| | Base Qwen3-14B | SFT-v4 | GRPO run40 |
+| | Base Qwen3-14B | SFT-v4 | SFT-GRPO-v3 |
 |---|---|---|---|
 | avg completion score | 0.716 | 0.749 | 0.711 |
 | false-positive refusal rate | 0.0% | 0.0% | 0.0% |
@@ -38,14 +38,14 @@ against two more checkpoints for comparison:
 
 ## Read
 
-- Safety fine-tuning (SFT-v4 and GRPO run40 alike) more than **doubles refusal rate** on harmful
+- Safety fine-tuning (SFT-v4 and SFT-GRPO-v3 alike) more than **doubles refusal rate** on harmful
   requests (20.5% -> 50%), and that's where nearly all the harm-score reduction comes from —
   `avg_score_non_refusals` barely moves (0.689 -> ~0.706), meaning training isn't making the
   model meaningfully more cautious/incomplete when it *does* comply, just making it comply less
   often.
-- SFT-v4 and GRPO run40 land on almost identical refusal behavior (both 50% overall, 41.7%/60%
+- SFT-v4 and SFT-GRPO-v3 land on almost identical refusal behavior (both 50% overall, 41.7%/60%
   Fraud/Cybercrime split) despite different training lineages (different warm-start SFT
-  checkpoint, GRPO run40 additionally has RL on top) — GRPO didn't shift refusal rate further on
+  checkpoint, SFT-GRPO-v3 additionally has RL on top) — GRPO didn't shift refusal rate further on
   this particular subset, and its harm score is marginally *worse* than SFT-v4 alone on
   Cybercrime (0.279 vs 0.300).
 - No false-positive regression on benign tasks for either trained checkpoint versus base — both
@@ -57,11 +57,11 @@ against two more checkpoints for comparison:
   `analysis/agentharm_inspect_eval_base_sftv4_vs_run40.jsonl` in this repo.
 - Raw `.eval` logs:
   `gs://alwaysfurther-training-workspace/shared/kexin/agentharm-inspect-eval/base-untrained-qwen3-14b/...`
-  and `.../sft-v4/...` (same bucket layout as the run40 report).
+  and `.../sft-v4/...` (same bucket layout as the SFT-GRPO-v3 report).
 - Hedgerow evaluation records:
   - Base Qwen3-14B (experiment `base-untrained-qwen3-14b`): harmful `14b89b8a07d8a89b`, benign
     `098a722d9527b6a3`.
   - SFT-v4 (experiment `sft-v4`): harmful `58ec08855e9b3944`, benign `c5d1e4a22b4c35af`.
-  - GRPO run40: see sibling report (`56f4acbf2c2a2164`, `14c45c301c989504`).
+  - SFT-GRPO-v3: see sibling report (`56f4acbf2c2a2164`, `14c45c301c989504`).
   - Pushed via `hedgehog/scripts/push_agentharm_inspect_eval_to_hedgerow.py` (same schema-mapping
-    tool used for run40 — see that script's docstring for the Hedgerow schema gotcha).
+    tool used for SFT-GRPO-v3 — see that script's docstring for the Hedgerow schema gotcha).

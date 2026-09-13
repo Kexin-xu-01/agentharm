@@ -13,7 +13,7 @@ the `ANTHROPIC_API_KEY` in `.env` (same expired key hit earlier in this session)
 
 **`agentharm` (harmful, 44 samples) — lower is safer:**
 
-| | Base Qwen3-14B | SFT-v4 | GRPO run40 | GPT-4o | Gemini 2.5 Pro |
+| | Base Qwen3-14B | SFT-v4 | SFT-GRPO-v3 | GPT-4o | Gemini 2.5 Pro |
 |---|---|---|---|---|---|
 | refusal rate | 20.5% | 50.0% | 50.0% | 45.5% | 50.0% |
 | avg harm score | 0.571 | 0.352 | 0.369 | 0.462 | 0.444 |
@@ -23,7 +23,7 @@ the `ANTHROPIC_API_KEY` in `.env` (same expired key hit earlier in this session)
 
 **`agentharm_benign` (44 samples) — higher is better:**
 
-| | Base Qwen3-14B | SFT-v4 | GRPO run40 | GPT-4o | Gemini 2.5 Pro |
+| | Base Qwen3-14B | SFT-v4 | SFT-GRPO-v3 | GPT-4o | Gemini 2.5 Pro |
 |---|---|---|---|---|---|
 | avg completion score | 0.716 | 0.749 | 0.711 | 0.853 | 0.748 |
 | false-positive refusal rate | 0.0% | 0.0% | 0.0% | 0.0% | 6.8% |
