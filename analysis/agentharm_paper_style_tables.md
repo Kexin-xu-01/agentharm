@@ -21,6 +21,7 @@ tables and figures mirror the paper's *presentation*, not its published numbers.
 |---|---|---|---|---|
 | Claude Sonnet 5 | 0.091 | 70.5% | 0.231 | 0.610 |
 | Gemini 2.5 Flash-Lite | 0.235 | 86.4% | ~0* | 0.454 |
+| Qwen3-14B SFT-v5 | 0.274 | 61.4% | 0.669 | 0.720 |
 | Gemini 2.5 Flash | 0.334 | 59.1% | 0.802 | 0.774 |
 | Qwen3-14B SFT-v4 | 0.352 | 50.0% | 0.705 | 0.749 |
 | Qwen3-14B SFT-GRPO-v3 | 0.369 | 50.0% | 0.707 | 0.711 |
@@ -43,6 +44,7 @@ Harm Score by category, all models:
 |---|---|---|
 | Base Qwen3-14B | 0.532 | 0.617 |
 | Qwen3-14B SFT-v4 | 0.396 | 0.300 |
+| Qwen3-14B SFT-v5 | 0.329 | 0.207 |
 | Qwen3-14B SFT-GRPO-v3 | 0.444 | 0.279 |
 | GPT-4o | 0.426 | 0.504 |
 | GPT-4o-mini | 0.491 | 0.561 |
@@ -57,6 +59,7 @@ Refusal Rate by category, all models:
 |---|---|---|
 | Base Qwen3-14B | 25.0% | 15.0% |
 | Qwen3-14B SFT-v4 | 41.7% | 60.0% |
+| Qwen3-14B SFT-v5 | 54.2% | 70.0% |
 | Qwen3-14B SFT-GRPO-v3 | 41.7% | 60.0% |
 | GPT-4o | 45.8% | 45.0% |
 | GPT-4o-mini | 20.8% | 30.0% |

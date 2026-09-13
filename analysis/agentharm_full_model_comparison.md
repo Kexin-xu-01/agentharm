@@ -18,6 +18,7 @@ for Qwen-family `<tool_call>` tags); proprietary models were hit directly via th
 |---|---|
 | Base Qwen3-14B | `Qwen/Qwen3-14B`, untrained, no hedgehog fine-tuning |
 | Qwen3-14B SFT-v4 | `hedgehog-train_42` merged, Hedgerow experiment `sft-v4` |
+| Qwen3-14B SFT-v5 | `hedgehog-train_56` LoRA adapter (no merge; served via vLLM's native LoRA support), Hedgerow experiment `sft-v5` |
 | Qwen3-14B SFT-GRPO-v3 | `hedgehog-train_40` merged, Hedgerow experiment `agentharm-sft-grpo-v2-v3-lmmjudge` |
 | GPT-4o | `openai/gpt-4o-2024-08-06` |
 | GPT-4o-mini | `openai/gpt-4o-mini` |
@@ -32,6 +33,7 @@ for Qwen-family `<tool_call>` tags); proprietary models were hit directly via th
 |---|---|---|---|---|---|
 | Base Qwen3-14B | 20.5% | 0.571 | 0.689 | 25.0% / 0.532 | 15.0% / 0.617 |
 | Qwen3-14B SFT-v4 | 50.0% | 0.352 | 0.705 | 41.7% / 0.396 | 60.0% / 0.300 |
+| Qwen3-14B SFT-v5 | 61.4% | 0.274 | 0.669 | 54.2% / 0.329 | 70.0% / 0.207 |
 | Qwen3-14B SFT-GRPO-v3 | 50.0% | 0.369 | 0.707 | 41.7% / 0.444 | 60.0% / 0.279 |
 | GPT-4o | 45.5% | 0.462 | 0.807 | 45.8% / 0.426 | 45.0% / 0.504 |
 | GPT-4o-mini | 25.0% | 0.523 | 0.631 | 20.8% / 0.491 | 30.0% / 0.561 |
@@ -49,6 +51,7 @@ signal for Flash-Lite.
 |---|---|---|---|---|
 | Base Qwen3-14B | 0.716 | 0.0% | 0.641 / 0% | 0.807 / 0% |
 | Qwen3-14B SFT-v4 | 0.749 | 0.0% | 0.742 / 0% | 0.757 / 0% |
+| Qwen3-14B SFT-v5 | 0.720 | 2.3% | 0.677 / 4.2% | 0.771 / 0% |
 | Qwen3-14B SFT-GRPO-v3 | 0.711 | 0.0% | 0.679 / 0% | 0.750 / 0% |
 | GPT-4o | 0.853 | 0.0% | 0.789 / 0% | 0.929 / 0% |
 | GPT-4o-mini | 0.762 | 0.0% | 0.649 / 0% | 0.897 / 0% |
@@ -63,6 +66,11 @@ signal for Flash-Lite.
    Qwen3-14B SFT-v4 and Qwen3-14B SFT-GRPO-v3 both jump from the base model's 20.5% harmful-refusal rate to 50%, and
    the harm-score drop is driven almost entirely by refusing more often -- `avg_score_non_refusals`
    barely moves (0.689 -> ~0.706). Neither trained checkpoint shows any benign false positives.
+   **SFT-v5 pushes this further**: 61.4% refusal, harm score down to 0.274 (the best of any
+   hedgehog checkpoint), while benign completion stays close to SFT-v4 (0.720 vs 0.749) -- the
+   only cost is a small false-positive rate (2.3%, one Fraud sample) where v4 was a clean 0%.
+   Notably v5 was evaluated straight off its LoRA adapter (no merge step) via vLLM's native
+   `base-model:adapter-path` serving syntax.
 2. **GPT-4o is the strongest all-round model tested**: highest benign completion (0.853) and
    highest non-refusal harm score (0.807, meaning when it *does* comply it's the most thorough --
    a double-edged property, good for legitimate agentic tasks, worse for jailbreak resistance
@@ -90,14 +98,15 @@ signal for Flash-Lite.
 - Per-batch reports + per-sample JSONL (this repo, `analysis/`):
   - `agentharm_inspect_eval_run40_fraud_cybercrime.{md,jsonl}` — Qwen3-14B SFT-GRPO-v3 only
   - `agentharm_inspect_eval_base_sftv4_vs_run40.{md,jsonl}` — base Qwen3-14B + Qwen3-14B SFT-v4
+  - `agentharm_inspect_eval_sft_v5.{md,jsonl}` — Qwen3-14B SFT-v5
   - `agentharm_inspect_eval_gpt4o_gemini.{md,jsonl}` — GPT-4o + Gemini 2.5 Pro
   - `agentharm_inspect_eval_flash_flashlite_gpt4omini.{md,jsonl}` — Flash, Flash-Lite, GPT-4o-mini
   - `agentharm_inspect_eval_claude_sonnet5.{md,jsonl}` — Claude Sonnet 5
 - Raw `.eval` logs (full transcripts, tool calls, judge outputs): `logs/` in this repo.
 - Hedgerow (https://hedgerow.nolabs.dev) evaluation records, one experiment per model:
-  `agentharm-sft-grpo-v2-v3-lmmjudge` (Qwen3-14B SFT-GRPO-v3), `sft-v4`, `base-untrained-qwen3-14b`,
-  `gpt-4o-2024-08-06`, `gpt-4o-mini`, `gemini-2.5-pro`, `gemini-2.5-flash`,
-  `gemini-2.5-flash-lite`, `claude-sonnet-5`. Pushed via
+  `agentharm-sft-grpo-v2-v3-lmmjudge` (Qwen3-14B SFT-GRPO-v3), `sft-v4`, `sft-v5`,
+  `base-untrained-qwen3-14b`, `gpt-4o-2024-08-06`, `gpt-4o-mini`, `gemini-2.5-pro`,
+  `gemini-2.5-flash`, `gemini-2.5-flash-lite`, `claude-sonnet-5`. Pushed via
   `hedgehog/scripts/push_agentharm_inspect_eval_to_hedgerow.py` (see that script's docstring for
   a schema-mapping gotcha in Hedgerow's evaluation API).
 - Eval harness: `hedgehog/scripts/agentharm-inspect-eval.sky.yaml` (SkyPilot job for local/merged
