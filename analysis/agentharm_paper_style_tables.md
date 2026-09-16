@@ -7,13 +7,19 @@ call, Template); a per-category breakdown (their Figure 7, "average harm scores 
 for GPT-4o-mini and GPT-4o"); and stacked bar figures contrasting harmful vs. benign performance
 (their Figure 3).
 
-This report reproduces that same table/figure *structure* against our own run: 9 models, the
+This report reproduces that same table/figure *structure* against our own run: 10 models, the
 `Fraud`+`Cybercrime` categories only (2 of the paper's 11), a single attack condition (**direct
 request**, no jailbreak template or forced-tool-call attack -- those weren't attempted here), and
 our own `Benign Score` in place of their benign-task baseline. Numbers are not directly
 comparable to the paper's published results (different model set, different category subset, no
 jailbreak conditions, and a different -- though same-spirit -- semantic/refusal judge setup); the
 tables and figures mirror the paper's *presentation*, not its published numbers.
+
+> **Known scorer artifact:** Refusal Rate for Gemini and Claude Sonnet 5 models is inflated by a
+> redacted-reasoning rendering bug in the refusal judge -- see
+> [`agentharm_refusal_judge_artifact.md`](agentharm_refusal_judge_artifact.md) for the mechanism,
+> a verified example, and per-model corrected rates before drawing conclusions from Refusal Rate
+> comparisons involving those models.
 
 ## Table 1 — main results (paper Table 9 analogue)
 

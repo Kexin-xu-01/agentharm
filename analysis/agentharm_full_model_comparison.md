@@ -8,6 +8,13 @@ Refusal and semantic (task-completion) judging both use `openai/gpt-4o-2024-08-0
 models were served via `inspect_ai`'s `vllm/` provider (with the `hermes` tool-call-parser fix
 for Qwen-family `<tool_call>` tags); proprietary models were hit directly via their hosted APIs.
 
+> **Known scorer artifact -- read before trusting any Gemini or Claude false-positive number:**
+> the refusal judge can misflag a fully-completed task as a "refusal" when the model's reasoning
+> came back redacted by the provider. Verified example, quantified per-model impact, and why the
+> tables below still report the raw (uncorrected) numbers: see
+> [`agentharm_refusal_judge_artifact.md`](agentharm_refusal_judge_artifact.md). Two of the "Key
+> findings" further down don't survive the correction -- flagged inline where they occur.
+
 ![Safety vs. utility scatter](plots/safety_vs_utility.png)
 
 ![Refusal rate vs. benign false-positive rate](plots/refusal_vs_false_positive.png)
@@ -80,17 +87,26 @@ signal for Flash-Lite.
    sharply from Pro (50.0%) to Flash (59.1%) to Flash-Lite (86.4%), and this is NOT selective
    caution -- benign completion collapses in lockstep (0.748 -> 0.774 -> 0.454). Flash-Lite in
    particular can't distinguish harmful from benign Fraud requests on this subset: 100% harmful
-   refusal but also 83.3% *benign* refusal.
+   refusal but also 83.3% *benign* refusal. **Caveat:** a meaningful chunk of Flash-Lite's raw
+   numbers is the redacted-reasoning judge artifact -- corrected benign false-positive rate is
+   29.5%, not 72.7% (still elevated, not as extreme). See
+   [`agentharm_refusal_judge_artifact.md`](agentharm_refusal_judge_artifact.md).
 4. **Gemini 2.5 Pro is the only model besides Flash-Lite with any false positives** (6.8%
    overall, all on Fraud) -- every hedgehog checkpoint, both GPT-4o variants, and Gemini Flash
-   hit a clean 0%.
+   hit a clean 0%. **This does not survive correction for the judge artifact below** -- all 3 of
+   Gemini 2.5 Pro's flagged benign samples are contradictions (task fully completed, no refusal
+   language); its corrected false-positive rate is 0.0%, same as everyone but Flash-Lite/Claude.
 5. **Claude Sonnet 5 has the lowest harm score of any model tested (0.091)** -- more than 2x
    safer than the next best (Flash-Lite, 0.235) by that metric, and unlike Flash-Lite its
    non-refusal score is meaningfully above zero (0.231), so it's not *purely* blanket refusal.
-   But it pays for this with the **second-highest benign false-positive rate** (61.4%, behind
-   only Flash-Lite's 72.7%) -- the same "refuse the whole category" pattern as Flash-Lite, just
-   less extreme. On this subset, the two models with the best harm scores are also the two
-   worst on benign utility -- there is no model tested that is both safe *and* low-friction by
+   Raw numbers show a **second-highest benign false-positive rate** (61.4%, behind only
+   Flash-Lite's 72.7%), read as the same "refuse the whole category" pattern as Flash-Lite, just
+   less extreme -- **overstated**: 18 of Claude's 27 flagged benign samples are the redacted-
+   reasoning judge artifact (see
+   [`agentharm_refusal_judge_artifact.md`](agentharm_refusal_judge_artifact.md)); corrected rate
+   is 20.5%, not in the same tier as Flash-Lite at all. On this subset, the two models with the
+   best harm scores are also the two worst on benign utility -- there is no model tested that is
+   both safe *and* low-friction by
    these numbers.
 
 ## Where the underlying data lives
@@ -102,6 +118,8 @@ signal for Flash-Lite.
   - `agentharm_inspect_eval_gpt4o_gemini.{md,jsonl}` — GPT-4o + Gemini 2.5 Pro
   - `agentharm_inspect_eval_flash_flashlite_gpt4omini.{md,jsonl}` — Flash, Flash-Lite, GPT-4o-mini
   - `agentharm_inspect_eval_claude_sonnet5.{md,jsonl}` — Claude Sonnet 5
+- Known scorer artifact (redacted-reasoning false-positive refusals): `agentharm_refusal_judge_artifact.md`,
+  reproducible via `analysis/check_refusal_judge_contradictions.py`.
 - Raw `.eval` logs (full transcripts, tool calls, judge outputs): `logs/` in this repo.
 - Hedgerow (https://hedgerow.nolabs.dev) evaluation records, one experiment per model:
   `agentharm-sft-grpo-v2-v3-lmmjudge` (Qwen3-14B SFT-GRPO-v3), `sft-v4`, `sft-v5`,
