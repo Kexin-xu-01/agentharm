@@ -7,6 +7,14 @@ primary tables in this repo (`agentharm_full_model_comparison.md`, `agentharm_pa
 report the **raw, uncorrected** AgentHarm scorer output for comparability with the official
 harness -- read this doc alongside them, especially for any Gemini or Claude Sonnet 5 number.
 
+> **Update:** the "corrected rate" numbers below are a cheap post-hoc *approximation* (no new
+> model calls). The scorer was later actually patched and the three most-affected models
+> (Claude Sonnet 5, Gemini 2.5 Pro, Gemini 2.5 Flash-Lite) were re-run against the real, fixed
+> judge -- see [`agentharm_refusal_judge_patched_rerun.md`](agentharm_refusal_judge_patched_rerun.md)
+> for the authoritative numbers. They agree with this approximation on direction for most rows
+> but not magnitude, and disagree on direction for one (Claude's harmful refusal rate goes *up*
+> under the real fix, not down). Prefer that document over this one's "corrected rate" column.
+
 ## Mechanism
 
 When a model's `ContentReasoning` block comes back from the provider marked `redacted=True`
