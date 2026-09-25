@@ -1,0 +1,225 @@
+{
+  "refusal_rates": {
+    "Base": {
+      "Disinformation": 0.0,
+      "Drugs": 20.0,
+      "Harassment": 33.333333333333336,
+      "Fraud": 29.166666666666668,
+      "Hate": 25.0,
+      "Cybercrime": 15.0,
+      "Sexual": 29.166666666666668,
+      "Copyright": 0.0
+    },
+    "SFT-v4": {
+      "Disinformation": 30.0,
+      "Drugs": 30.0,
+      "Harassment": 54.166666666666664,
+      "Fraud": 41.666666666666664,
+      "Hate": 65.0,
+      "Cybercrime": 65.0,
+      "Sexual": 66.66666666666667,
+      "Copyright": 4.166666666666667
+    },
+    "SFT-v5": {
+      "Disinformation": 35.0,
+      "Drugs": 45.0,
+      "Harassment": 66.66666666666667,
+      "Fraud": 58.333333333333336,
+      "Hate": 80.0,
+      "Cybercrime": 75.0,
+      "Sexual": 83.33333333333333,
+      "Copyright": 8.333333333333334
+    },
+    "SFT-GRPO-v3": {
+      "Disinformation": 15.0,
+      "Drugs": 25.0,
+      "Harassment": 50.0,
+      "Fraud": 41.666666666666664,
+      "Hate": 50.0,
+      "Cybercrime": 55.0,
+      "Sexual": 62.5,
+      "Copyright": 4.166666666666667
+    }
+  },
+  "transfer": {
+    "Copyright": {
+      "SFT-v4": 4.166666666666667,
+      "SFT-v5": 8.333333333333334,
+      "SFT-GRPO-v3": 4.166666666666667,
+      "avg": 5.555555555555556
+    },
+    "Cybercrime": {
+      "SFT-v4": 50.0,
+      "SFT-v5": 60.0,
+      "SFT-GRPO-v3": 40.0,
+      "avg": 50.0
+    },
+    "Disinformation": {
+      "SFT-v4": 30.0,
+      "SFT-v5": 35.0,
+      "SFT-GRPO-v3": 15.0,
+      "avg": 26.666666666666668
+    },
+    "Drugs": {
+      "SFT-v4": 10.0,
+      "SFT-v5": 25.0,
+      "SFT-GRPO-v3": 5.0,
+      "avg": 13.333333333333334
+    },
+    "Fraud": {
+      "SFT-v4": 12.499999999999996,
+      "SFT-v5": 29.166666666666668,
+      "SFT-GRPO-v3": 12.499999999999996,
+      "avg": 18.055555555555554
+    },
+    "Harassment": {
+      "SFT-v4": 20.83333333333333,
+      "SFT-v5": 33.333333333333336,
+      "SFT-GRPO-v3": 16.666666666666664,
+      "avg": 23.61111111111111
+    },
+    "Hate": {
+      "SFT-v4": 40.0,
+      "SFT-v5": 55.0,
+      "SFT-GRPO-v3": 25.0,
+      "avg": 40.0
+    },
+    "Sexual": {
+      "SFT-v4": 37.5,
+      "SFT-v5": 54.16666666666666,
+      "SFT-GRPO-v3": 33.33333333333333,
+      "avg": 41.666666666666664
+    }
+  },
+  "similarity_to_trained_centroid": {
+    "Copyright": 0.6422266116855424,
+    "Cybercrime": 0.7058812113561075,
+    "Disinformation": 0.597964855001556,
+    "Drugs": 0.5815214489096953,
+    "Fraud": 0.6843106780632096,
+    "Harassment": 0.5870828385215362,
+    "Hate": 0.47191285277686346,
+    "Sexual": 0.5515643242143421
+  },
+  "similarity_to_trained_pairwise": {
+    "Copyright": 0.23011734920978366,
+    "Cybercrime": 0.2487128532967719,
+    "Disinformation": 0.2041948535837347,
+    "Drugs": 0.22017807555836894,
+    "Fraud": 0.2276914806173876,
+    "Harassment": 0.2095981706084996,
+    "Hate": 0.17965887900051491,
+    "Sexual": 0.20120521091526128
+  },
+  "category_similarity_matrix": {
+    "Copyright": {
+      "Copyright": 1.0,
+      "Cybercrime": 0.6011168070523195,
+      "Disinformation": 0.7161160672055717,
+      "Drugs": 0.5148173029905233,
+      "Fraud": 0.578053167513534,
+      "Harassment": 0.6082408721254556,
+      "Hate": 0.5717871202515218,
+      "Sexual": 0.6335782803100848
+    },
+    "Cybercrime": {
+      "Copyright": 0.6011168070523195,
+      "Cybercrime": 1.0,
+      "Disinformation": 0.6191593937165486,
+      "Drugs": 0.6330342471162766,
+      "Fraud": 0.7612794096875838,
+      "Harassment": 0.6443564837626953,
+      "Hate": 0.5839534222716524,
+      "Sexual": 0.5968287357038303
+    },
+    "Disinformation": {
+      "Copyright": 0.7161160672055717,
+      "Cybercrime": 0.6191593937165486,
+      "Disinformation": 1.0000000000000002,
+      "Drugs": 0.5390883008014462,
+      "Fraud": 0.5963063290292404,
+      "Harassment": 0.6853243064842572,
+      "Hate": 0.6396299994036869,
+      "Sexual": 0.7090021258793646
+    },
+    "Drugs": {
+      "Copyright": 0.5148173029905233,
+      "Cybercrime": 0.6330342471162766,
+      "Disinformation": 0.5390883008014462,
+      "Drugs": 1.0,
+      "Fraud": 0.6666057301165209,
+      "Harassment": 0.5763954980809772,
+      "Hate": 0.4978990917883612,
+      "Sexual": 0.5564731430624572
+    },
+    "Fraud": {
+      "Copyright": 0.578053167513534,
+      "Cybercrime": 0.7612794096875838,
+      "Disinformation": 0.5963063290292404,
+      "Drugs": 0.6666057301165209,
+      "Fraud": 1.0,
+      "Harassment": 0.6462743132493627,
+      "Hate": 0.542880608122449,
+      "Sexual": 0.5762718779231514
+    },
+    "Harassment": {
+      "Copyright": 0.6082408721254556,
+      "Cybercrime": 0.6443564837626953,
+      "Disinformation": 0.6853243064842572,
+      "Drugs": 0.5763954980809772,
+      "Fraud": 0.6462743132493627,
+      "Harassment": 1.0,
+      "Hate": 0.7020342736995445,
+      "Sexual": 0.7213987508894989
+    },
+    "Hate": {
+      "Copyright": 0.5717871202515218,
+      "Cybercrime": 0.5839534222716524,
+      "Disinformation": 0.6396299994036869,
+      "Drugs": 0.4978990917883612,
+      "Fraud": 0.542880608122449,
+      "Harassment": 0.7020342736995445,
+      "Hate": 1.0,
+      "Sexual": 0.6620839724825857
+    },
+    "Sexual": {
+      "Copyright": 0.6335782803100848,
+      "Cybercrime": 0.5968287357038303,
+      "Disinformation": 0.7090021258793646,
+      "Drugs": 0.5564731430624572,
+      "Fraud": 0.5762718779231514,
+      "Harassment": 0.7213987508894989,
+      "Hate": 0.6620839724825857,
+      "Sexual": 1.0000000000000002
+    }
+  },
+  "categories": [
+    "Copyright",
+    "Cybercrime",
+    "Disinformation",
+    "Drugs",
+    "Fraud",
+    "Harassment",
+    "Hate",
+    "Sexual"
+  ],
+  "holdout_categories": [
+    "Copyright",
+    "Disinformation",
+    "Drugs",
+    "Harassment",
+    "Hate",
+    "Sexual"
+  ],
+  "n_train_prompts": 372,
+  "n_eval_prompts": {
+    "Copyright": 24,
+    "Cybercrime": 20,
+    "Disinformation": 20,
+    "Drugs": 20,
+    "Fraud": 24,
+    "Harassment": 24,
+    "Hate": 20,
+    "Sexual": 24
+  }
+}
