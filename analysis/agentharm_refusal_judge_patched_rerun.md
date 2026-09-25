@@ -1,5 +1,13 @@
 # Refusal judge: patched and re-run (most rigorous correction)
 
+> **Update (v2 patch):** the original patch used here only stripped one of *two* ways
+> `inspect_evals` renders a redacted reasoning block, and missed the form Claude Sonnet 5 almost
+> always produces (an open/close tag wrapping an opaque payload, rather than a self-closing empty
+> marker). This left 14 of Claude's 88 samples still misjudged. Fixed and re-run -- see
+> [`agentharm_refusal_judge_patched_v2_rerun.md`](agentharm_refusal_judge_patched_v2_rerun.md).
+> The Claude Sonnet 5 numbers in the tables and plots below have been updated in place to the v2
+> values; all 9 other models are unaffected and unchanged.
+
 This is the **third and most rigorous** version of the redacted-reasoning refusal-judge fix,
 **now covering all 10 models** in the study (initially validated on the three most-affected
 models -- Gemini 2.5 Flash-Lite, Gemini 2.5 Pro, Claude Sonnet 5 -- then extended to the
@@ -86,7 +94,7 @@ copy and made the first attempt at this look hung for 15+ minutes.
 | Gemini 2.5 Pro | 50.0% | **27.3%** | 6.8% | **0.0%** |
 | Gemini 2.5 Flash | 59.1% | **54.5%** | 0.0% | **2.3%** |
 | Gemini 2.5 Flash-Lite | 86.4% | **52.3%** | 72.7% | **0.0%** |
-| Claude Sonnet 5 | 70.5% | **72.7%** | 61.4% | **43.2%** |
+| Claude Sonnet 5 | 70.5% | **68.2%** (v2) | 61.4% | **9.1%** (v2) |
 
 Corresponding harm/completion scores from the patched re-run (new completions, so not directly
 comparable to the raw run's score either, though score itself was never touched by the judge
@@ -103,7 +111,7 @@ bug -- only the refusal flag was):
 | Gemini 2.5 Pro | 0.514 | 0.767 |
 | Gemini 2.5 Flash | 0.357 | 0.794 |
 | Gemini 2.5 Flash-Lite | 0.236 | 0.505 |
-| Claude Sonnet 5 | 0.091 | 0.641 |
+| Claude Sonnet 5 | 0.091 | 0.611 (v2) |
 
 ![Safety vs. utility, all 10 models, patched judge](plots/final_safety_vs_utility_patched.png)
 
@@ -116,10 +124,10 @@ bug -- only the refusal flag was):
   fraud/cybercrime category to begin with.
 - **The heuristic approximation** (`agentharm_refusal_judge_artifact.md`) **pointed the right
   direction on most of the three most-affected models but got the magnitude wrong**, sometimes
-  substantially (Claude's benign false-positive rate: heuristic said 20.5%, the real fix says
-  43.2% -- more than double). Treat those heuristic numbers as a rough approximation, not a
-  substitute for this document.
-- **Claude Sonnet 5's harmful refusal rate went *up* under the real fix** (70.5% → 72.7%), the
+  substantially (Claude's benign false-positive rate: heuristic said 20.5%, the v2 real fix says
+  9.1%). Treat those heuristic numbers as a rough approximation, not a substitute for this
+  document.
+- **Claude Sonnet 5's harmful refusal rate went *up* under the real fix** (70.5% → 68.2%), the
   opposite direction from every other severely-affected row. Mechanism: removing the false
   trigger on an early redacted-reasoning-only turn lets the loop's `break` reach *later* messages
   it never checked before -- some of which are genuine refusals the bug had been masking, not
@@ -131,10 +139,11 @@ bug -- only the refusal flag was):
 - **Gemini 2.5 Pro's harmful refusal rate is now the lowest of the proprietary models (27.3%)**,
   a large drop from its raw 50.0%, with its benign false-positive rate also going to a clean
   0.0% -- more than half of what looked like refusal was the redacted-reasoning bug.
-- **Claude Sonnet 5 remains the only model with a severe (>30%) benign false-positive rate after
-  the real fix** (43.2%). This is a genuine finding, not a judge artifact -- it survived the most
-  rigorous correction available and is the one result in this whole investigation that got
-  *worse*, not better, once the bug was actually fixed.
+- **No model has a severe (>=30%) benign false-positive rate after the v2 fix.** Claude Sonnet 5's
+  43.2% under the v1 patch turned out to be an artifact of that patch's incomplete coverage, not a
+  genuine Claude behavior -- see
+  [`agentharm_refusal_judge_patched_v2_rerun.md`](agentharm_refusal_judge_patched_v2_rerun.md) for
+  the full diagnosis. Its corrected rate (9.1%) is now in the same range as most other models.
 - **Qwen3-14B SFT-v4/GPT-4o's refusal rates moved up slightly** (50.0%→59.1%, 45.5%→54.5%)
   rather than down -- a reminder that "patched" doesn't mean "lower"; it means "judged on
   content the judge could actually see," which can cut either way per the same mechanism noted
@@ -143,14 +152,19 @@ bug -- only the refusal flag was):
 ## Where the data lives
 
 - Per-sample records (880 rows: 10 models × 2 tasks × 44 behaviors) in
-  `analysis/agentharm_inspect_eval_patched_judge_rerun.jsonl`.
+  `analysis/agentharm_inspect_eval_patched_judge_rerun.jsonl`. Claude Sonnet 5's rows are the v2
+  re-run (see update note above); all other models' rows are unchanged.
 - Raw `.eval` logs: `logs/patched-judge/` in this repo (20 files: 10 models × 2 tasks, kept
   separate from the original raw logs in `logs/` -- same behavior_ids, different judge code,
-  different live completions).
-- Patched scorer source: `analysis/patched-scorer/scorer.py`.
+  different live completions). Claude Sonnet 5's v1-patched logs are superseded by
+  `logs/patched-judge-v2/` but kept for traceability.
+- Patched scorer source: `analysis/patched-scorer/scorer.py` (v1); `analysis/patched-scorer-v2/scorer.py`
+  is what actually produced Claude Sonnet 5's numbers above.
 - Hedgerow evaluation records, all 10 models pushed under experiment names clearly suffixed
   `-patched-judge` (distinct from each model's original, unpatched experiment):
-  - `claude-sonnet-5-patched-judge`: harmful `830ac18b8b4da51a`, benign `d3df2cc7bc411f60`
+  - `claude-sonnet-5-patched-judge-v2` (current): harmful `1b249c57daa52242`, benign
+    `d91f29b7dc4a5f3e`. `claude-sonnet-5-patched-judge` (v1, superseded): harmful
+    `830ac18b8b4da51a`, benign `d3df2cc7bc411f60`
   - `gemini-2.5-pro-patched-judge`: harmful `1a4f467de4f87398`, benign `2674ab46d6aa3e33`
   - `gemini-2.5-flash-lite-patched-judge`: harmful `73992527e50a3a5f`, benign `375b8e55bc891a1d`
   - remaining seven models (Base Qwen3-14B, Qwen3-14B SFT-v4/v5/GRPO-v3, GPT-4o, GPT-4o-mini,
