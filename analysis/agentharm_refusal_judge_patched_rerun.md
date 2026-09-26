@@ -11,8 +11,18 @@
 > no text anywhere in the sample. Fixed and re-run -- see
 > [`agentharm_content_filter_blind_spot.md`](agentharm_content_filter_blind_spot.md). Claude Sonnet
 > 5's harmful refusal rate moves 68.2% -> 84.1% and its benign false-positive rate moves 9.1% ->
-> 22.7%. The Claude Sonnet 5 numbers in the tables and plots below have been updated in place to
-> the v3 values; all 9 other models are unaffected and unchanged.
+> 22.7%. **All 10 models were subsequently re-run against the v3 patch** (not just Claude) to
+> confirm the fix doesn't change anything for models that never hit the content-filter-block
+> condition -- it doesn't; the other 9 models' numbers below are fresh live re-runs and land within
+> ordinary run-to-run variance of their v2 values, none shifted by more than ~7 points. Every
+> number in the tables and plots below is now the v3 re-run.
+>
+> **Caveat (not patched):** even after v3, the judge still misses genuine refusals when Claude
+> investigates first and declines the harmful step afterward, rather than issuing a bare
+> templated refusal -- a bias baked into the upstream judge's own prompt, not something any patch
+> in this repo touches. See
+> [`agentharm_refusal_judge_prompt_bias_caveat.md`](agentharm_refusal_judge_prompt_bias_caveat.md).
+> Treat every refusal rate below as a lower bound, not an exact count.
 
 This is the **third and most rigorous** version of the redacted-reasoning refusal-judge fix,
 **now covering all 10 models** in the study (initially validated on the three most-affected
@@ -92,15 +102,19 @@ copy and made the first attempt at this look hung for 15+ minutes.
 | Model | Harmful refusal (raw) | Harmful refusal (**patched**) | Benign false-positive (raw) | Benign false-positive (**patched**) |
 |---|---|---|---|---|
 | Base Qwen3-14B | 20.5% | **13.6%** | 0.0% | **0.0%** |
-| Qwen3-14B SFT-v4 | 50.0% | **59.1%** | 0.0% | **0.0%** |
+| Qwen3-14B SFT-v4 | 50.0% | **54.5%** | 0.0% | **0.0%** |
 | Qwen3-14B SFT-v5 | 61.4% | **63.6%** | 2.3% | **2.3%** |
-| Qwen3-14B SFT-GRPO-v3 | 50.0% | **47.7%** | 0.0% | **0.0%** |
-| GPT-4o | 45.5% | **54.5%** | 0.0% | **0.0%** |
-| GPT-4o-mini | 25.0% | **25.0%** | 0.0% | **0.0%** |
-| Gemini 2.5 Pro | 50.0% | **27.3%** | 6.8% | **0.0%** |
-| Gemini 2.5 Flash | 59.1% | **54.5%** | 0.0% | **2.3%** |
-| Gemini 2.5 Flash-Lite | 86.4% | **52.3%** | 72.7% | **0.0%** |
-| Claude Sonnet 5 | 70.5% | **84.1%** (v3) | 61.4% | **22.7%** (v3) |
+| Qwen3-14B SFT-GRPO-v3 | 50.0% | **50.0%** | 0.0% | **0.0%** |
+| GPT-4o | 45.5% | **47.7%** | 0.0% | **0.0%** |
+| GPT-4o-mini | 25.0% | **27.3%** | 0.0% | **0.0%** |
+| Gemini 2.5 Pro | 50.0% | **25.0%** | 6.8% | **0.0%** |
+| Gemini 2.5 Flash | 59.1% | **56.8%** | 0.0% | **2.3%** |
+| Gemini 2.5 Flash-Lite | 86.4% | **59.1%** | 72.7% | **2.3%** |
+| Claude Sonnet 5 | 70.5% | **84.1%** | 61.4% | **22.7%** |
+
+*(All 10 rows are the v3 patch. For the 9 non-Claude models, "patched" here is a fresh live
+re-run against v3, not a rescoring of the v1/v2 transcripts -- see the run-to-run variance note
+above.)*
 
 Corresponding harm/completion scores from the patched re-run (new completions, so not directly
 comparable to the raw run's score either, though score itself was never touched by the judge
@@ -108,26 +122,26 @@ bug -- only the refusal flag was):
 
 | Model | Harm score (harmful) | Completion score (benign) |
 |---|---|---|
-| Base Qwen3-14B | 0.510 | 0.733 |
-| Qwen3-14B SFT-v4 | 0.355 | 0.709 |
-| Qwen3-14B SFT-v5 | 0.288 | 0.733 |
-| Qwen3-14B SFT-GRPO-v3 | 0.388 | 0.744 |
-| GPT-4o | 0.412 | 0.844 |
-| GPT-4o-mini | 0.610 | 0.751 |
-| Gemini 2.5 Pro | 0.514 | 0.767 |
-| Gemini 2.5 Flash | 0.357 | 0.794 |
-| Gemini 2.5 Flash-Lite | 0.236 | 0.505 |
-| Claude Sonnet 5 | 0.100 | 0.578 (v3) |
+| Base Qwen3-14B | 0.533 | 0.700 |
+| Qwen3-14B SFT-v4 | 0.323 | 0.715 |
+| Qwen3-14B SFT-v5 | 0.260 | 0.718 |
+| Qwen3-14B SFT-GRPO-v3 | 0.399 | 0.713 |
+| GPT-4o | 0.472 | 0.844 |
+| GPT-4o-mini | 0.545 | 0.729 |
+| Gemini 2.5 Pro | 0.470 | 0.715 |
+| Gemini 2.5 Flash | 0.373 | 0.789 |
+| Gemini 2.5 Flash-Lite | 0.181 | 0.551 |
+| Claude Sonnet 5 | 0.100 | 0.578 |
 
 ![Safety vs. utility, all 10 models, patched judge](plots/final_safety_vs_utility_patched.png)
 
 ## Read
 
 - **The bug's impact was concentrated in the three models originally flagged, not spread evenly
-  across all 10.** For the other seven, raw and patched numbers mostly agree within a couple of
-  points (GPT-4o-mini: identical 25.0% either way; the hedgehog checkpoints all move by ≤9
-  points), consistent with those models producing far less redacted reasoning in the
-  fraud/cybercrime category to begin with.
+  across all 10.** For the other seven, raw and patched numbers mostly agree within a handful of
+  points (the small remaining gaps are ordinary run-to-run variance from fresh live completions,
+  not the judge fix -- see the v3 update note above), consistent with those models producing far
+  less redacted reasoning in the fraud/cybercrime category to begin with.
 - **The heuristic approximation** (`agentharm_refusal_judge_artifact.md`) **pointed the right
   direction on most of the three most-affected models but got the magnitude wrong**, sometimes
   substantially (Claude's benign false-positive rate: heuristic said 20.5%, the v3 real fix says
@@ -172,13 +186,24 @@ bug -- only the refusal flag was):
 - Patched scorer source: `analysis/patched-scorer/scorer.py` (v1), `analysis/patched-scorer-v2/scorer.py`
   (v2); `analysis/patched-scorer-v3/scorer.py` is what actually produced Claude Sonnet 5's numbers
   above.
-- Hedgerow evaluation records, all 10 models pushed under experiment names clearly suffixed
-  `-patched-judge` (distinct from each model's original, unpatched experiment):
+- Hedgerow evaluation records: **all versions for a given model are pushed into the same
+  `<model>-patched-judge` experiment** (not split across version-suffixed experiments) --
+  differentiate by the `model_name` field, which states which patch version produced each run.
+  Claude Sonnet 5 is the one exception, having accumulated separate `claude-sonnet-5-patched-judge`
+  (v1), `-v2`, and `-v3` experiments before this convention was adopted; those three are left as-is
+  for traceability rather than retroactively merged.
   - `claude-sonnet-5-patched-judge-v3` (current): harmful `7966b1ec71b605ab`, benign
-    `ab0f5e985ed61bc6`. `claude-sonnet-5-patched-judge-v2` (superseded): harmful
-    `1b249c57daa52242`, benign `d91f29b7dc4a5f3e`. `claude-sonnet-5-patched-judge` (v1,
-    superseded): harmful `830ac18b8b4da51a`, benign `d3df2cc7bc411f60`
-  - `gemini-2.5-pro-patched-judge`: harmful `1a4f467de4f87398`, benign `2674ab46d6aa3e33`
-  - `gemini-2.5-flash-lite-patched-judge`: harmful `73992527e50a3a5f`, benign `375b8e55bc891a1d`
-  - remaining seven models (Base Qwen3-14B, Qwen3-14B SFT-v4/v5/GRPO-v3, GPT-4o, GPT-4o-mini,
-    Gemini 2.5 Flash) pushed under the same `<model>-patched-judge` naming convention.
+    `ab0f5e985ed61bc6`. `-v2` and (unsuffixed, v1) versions kept separately, see the v2/v3 docs.
+  - `base-untrained-qwen3-14b-patched-judge`: v3 harmful `349832778cffd8b3`, benign `8e32aceb0b94d1c0`
+  - `sft-v4-patched-judge`: v3 harmful `cff692c8114e5912`, benign `9053ed214b726329`
+  - `agentharm-sft-grpo-v2-v3-lmmjudge-patched-judge`: v3 harmful `6b153d307765cac7`, benign
+    `771130a2f3d09e0a`
+  - `sft-v5-patched-judge`: v3 harmful `c82ab7b2068a1059`, benign `550878e1372ce345`
+  - `gpt4o-patched-judge`: v3 harmful `8e866576d3344012`, benign `30dff2ff315dc6e3`
+  - `gpt4omini-patched-judge`: v3 harmful `3960a6b690bc4c7d`, benign `7236b3bef9d53204`
+  - `gemini-2.5-pro-patched-judge`: v3 harmful `bbef4adac67d8e10`, benign `37588edd171505d1`
+  - `gemini-2.5-flash-patched-judge`: v3 harmful `801a7cbc9da7d536`, benign `1936c15300792030`
+  - `gemini-2.5-flash-lite-patched-judge`: v3 harmful `92f6f219d9495cdf`, benign `a37b115c95451fd7`
+  - Two orphaned experiments (`gpt4o-patched-judge-v3`, `gpt4omini-patched-judge-v3`) exist from
+    an initial push that used the wrong naming convention before it was corrected -- harmless,
+    but not cleaned up (no delete API in the Hedgerow client).

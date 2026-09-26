@@ -203,17 +203,28 @@ Both metrics land close to the pre-patch projection in the diagnosis above (86.4
 projected from the v2 data) -- the small gaps are exactly that ordinary judge-flagging variance,
 not a sign the mechanism misfired.
 
+## Update: all 10 models subsequently re-run against v3
+
+The other 9 models were also run live against the v3 patch, to directly confirm the fix is a
+no-op for them (none of them hit the content-filter-block condition in this data) rather than
+just asserting it. Confirmed: all 9 land within ordinary run-to-run variance of their v1/v2
+numbers, no model shifted by more than ~7 points. Full per-model results and Hedgerow ids:
+[`agentharm_refusal_judge_patched_rerun.md`](agentharm_refusal_judge_patched_rerun.md).
+
+Also adopted from this point on: **all patch versions for a given model are pushed into the same
+`<model>-patched-judge` Hedgerow experiment**, differentiated via the `model_name` field, rather
+than a new version-suffixed experiment per patch (which is what Claude's own v1/v2/v3 history
+still looks like, predating this convention).
+
 ## Where the data lives
 
-- Per-sample records: `analysis/agentharm_inspect_eval_patched_judge_rerun.jsonl`, Claude Sonnet
-  5 rows replaced in place with the v3 re-run (44 harmful + 44 benign); all 9 other models'
-  rows are byte-identical to before.
-- Raw `.eval` logs: `logs/patched-judge-v3/` (2 files). `logs/patched-judge/` (v1) and
-  `logs/patched-judge-v2/` (v2) are both kept for traceability.
+- Per-sample records: `analysis/agentharm_inspect_eval_patched_judge_rerun.jsonl`, all 10 models'
+  rows are the v3 re-run (880 rows: 10 models x 2 tasks x 44 behaviors).
+- Raw `.eval` logs: `logs/patched-judge-v3/` (20 files: 10 models x 2 tasks). `logs/patched-judge/`
+  (v1) and `logs/patched-judge-v2/` (v2, Claude only) are both kept for traceability.
 - Patched scorer source: `analysis/patched-scorer-v3/scorer.py`.
-- Hedgerow: pushed under experiment `claude-sonnet-5-patched-judge-v3`: harmful `7966b1ec71b605ab`,
-  benign `ab0f5e985ed61bc6` (distinct from both `claude-sonnet-5-patched-judge` [v1] and
-  `claude-sonnet-5-patched-judge-v2`, which are left in place as a record of each fix's state).
-- Updated plots (Claude Sonnet 5 numbers only; all other models unchanged):
-  `final_harmful_refusal_raw_vs_patched.png`, `final_benign_fp_raw_vs_patched.png`,
-  `final_safety_vs_utility_patched.png`, `fraud_cybercrime_all10_refusal_vs_fp.png`.
+- Hedgerow ids for all 10 models: see the "Where the data lives" section in
+  [`agentharm_refusal_judge_patched_rerun.md`](agentharm_refusal_judge_patched_rerun.md).
+- Updated plots (all 10 models' final v3 numbers): `final_harmful_refusal_raw_vs_patched.png`,
+  `final_benign_fp_raw_vs_patched.png`, `final_safety_vs_utility_patched.png`,
+  `fraud_cybercrime_all10_refusal_vs_fp.png`.
