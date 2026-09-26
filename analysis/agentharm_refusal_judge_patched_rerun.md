@@ -5,8 +5,14 @@
 > always produces (an open/close tag wrapping an opaque payload, rather than a self-closing empty
 > marker). This left 14 of Claude's 88 samples still misjudged. Fixed and re-run -- see
 > [`agentharm_refusal_judge_patched_v2_rerun.md`](agentharm_refusal_judge_patched_v2_rerun.md).
-> The Claude Sonnet 5 numbers in the tables and plots below have been updated in place to the v2
-> values; all 9 other models are unaffected and unchanged.
+>
+> **Update (v3 patch):** separately, a *different* bug -- provider content-filter blocks (zero
+> output, no text at all) are invisible to the refusal judge, since it's never invoked when there's
+> no text anywhere in the sample. Fixed and re-run -- see
+> [`agentharm_content_filter_blind_spot.md`](agentharm_content_filter_blind_spot.md). Claude Sonnet
+> 5's harmful refusal rate moves 68.2% -> 84.1% and its benign false-positive rate moves 9.1% ->
+> 22.7%. The Claude Sonnet 5 numbers in the tables and plots below have been updated in place to
+> the v3 values; all 9 other models are unaffected and unchanged.
 
 This is the **third and most rigorous** version of the redacted-reasoning refusal-judge fix,
 **now covering all 10 models** in the study (initially validated on the three most-affected
@@ -94,7 +100,7 @@ copy and made the first attempt at this look hung for 15+ minutes.
 | Gemini 2.5 Pro | 50.0% | **27.3%** | 6.8% | **0.0%** |
 | Gemini 2.5 Flash | 59.1% | **54.5%** | 0.0% | **2.3%** |
 | Gemini 2.5 Flash-Lite | 86.4% | **52.3%** | 72.7% | **0.0%** |
-| Claude Sonnet 5 | 70.5% | **68.2%** (v2) | 61.4% | **9.1%** (v2) |
+| Claude Sonnet 5 | 70.5% | **84.1%** (v3) | 61.4% | **22.7%** (v3) |
 
 Corresponding harm/completion scores from the patched re-run (new completions, so not directly
 comparable to the raw run's score either, though score itself was never touched by the judge
@@ -111,7 +117,7 @@ bug -- only the refusal flag was):
 | Gemini 2.5 Pro | 0.514 | 0.767 |
 | Gemini 2.5 Flash | 0.357 | 0.794 |
 | Gemini 2.5 Flash-Lite | 0.236 | 0.505 |
-| Claude Sonnet 5 | 0.091 | 0.611 (v2) |
+| Claude Sonnet 5 | 0.100 | 0.578 (v3) |
 
 ![Safety vs. utility, all 10 models, patched judge](plots/final_safety_vs_utility_patched.png)
 
@@ -124,14 +130,17 @@ bug -- only the refusal flag was):
   fraud/cybercrime category to begin with.
 - **The heuristic approximation** (`agentharm_refusal_judge_artifact.md`) **pointed the right
   direction on most of the three most-affected models but got the magnitude wrong**, sometimes
-  substantially (Claude's benign false-positive rate: heuristic said 20.5%, the v2 real fix says
-  9.1%). Treat those heuristic numbers as a rough approximation, not a substitute for this
-  document.
-- **Claude Sonnet 5's harmful refusal rate went *up* under the real fix** (70.5% → 68.2%), the
-  opposite direction from every other severely-affected row. Mechanism: removing the false
-  trigger on an early redacted-reasoning-only turn lets the loop's `break` reach *later* messages
-  it never checked before -- some of which are genuine refusals the bug had been masking, not
-  creating.
+  substantially (Claude's benign false-positive rate: heuristic said 20.5%, the v3 real fix says
+  22.7% -- closer than the earlier v2 comparison suggested, though for a different reason: v2 was
+  itself incomplete). Treat those heuristic numbers as a rough approximation, not a substitute
+  for this document.
+- **Claude Sonnet 5's harmful refusal rate went *up* under each successive fix** (70.5% raw ->
+  68.2% v2 -> 84.1% v3), the opposite direction from every other severely-affected row. Two
+  distinct mechanisms compound here: removing the v1/v2 false triggers on redacted-reasoning-only
+  turns lets the loop's `break` reach *later* messages it never checked before (some of which are
+  genuine refusals the bug had been masking); and v3 additionally counts the 8 harmful samples
+  where Claude's own content-filter blocked all output outright as refusals -- see
+  [`agentharm_content_filter_blind_spot.md`](agentharm_content_filter_blind_spot.md).
 - **Gemini 2.5 Flash-Lite's benign false-positive rate drops to a clean 0.0%** under the real
   fix, down from 72.7% raw -- essentially all of its apparent over-refusal on benign tasks was
   this artifact, not a real behavioral problem. Its harmful refusal rate also drops the most of
@@ -139,11 +148,13 @@ bug -- only the refusal flag was):
 - **Gemini 2.5 Pro's harmful refusal rate is now the lowest of the proprietary models (27.3%)**,
   a large drop from its raw 50.0%, with its benign false-positive rate also going to a clean
   0.0% -- more than half of what looked like refusal was the redacted-reasoning bug.
-- **No model has a severe (>=30%) benign false-positive rate after the v2 fix.** Claude Sonnet 5's
-  43.2% under the v1 patch turned out to be an artifact of that patch's incomplete coverage, not a
-  genuine Claude behavior -- see
-  [`agentharm_refusal_judge_patched_v2_rerun.md`](agentharm_refusal_judge_patched_v2_rerun.md) for
-  the full diagnosis. Its corrected rate (9.1%) is now in the same range as most other models.
+- **Claude Sonnet 5 is the only model with a meaningful (>20%) benign false-positive rate after
+  the v3 fix (22.7%), and unlike the v1 patch's 43.2%, this one holds up** -- it's not a judge
+  artifact, it's 4 genuine content-filter blocks on legitimate benign requests (confirmed by
+  reading the actual blocked prompt: a normal business file-encryption task that superficially
+  resembles ransomware) plus the judge's own genuinely-flagged refusals. See
+  [`agentharm_content_filter_blind_spot.md`](agentharm_content_filter_blind_spot.md) for the full
+  breakdown.
 - **Qwen3-14B SFT-v4/GPT-4o's refusal rates moved up slightly** (50.0%→59.1%, 45.5%→54.5%)
   rather than down -- a reminder that "patched" doesn't mean "lower"; it means "judged on
   content the judge could actually see," which can cut either way per the same mechanism noted
@@ -152,19 +163,21 @@ bug -- only the refusal flag was):
 ## Where the data lives
 
 - Per-sample records (880 rows: 10 models × 2 tasks × 44 behaviors) in
-  `analysis/agentharm_inspect_eval_patched_judge_rerun.jsonl`. Claude Sonnet 5's rows are the v2
+  `analysis/agentharm_inspect_eval_patched_judge_rerun.jsonl`. Claude Sonnet 5's rows are the v3
   re-run (see update note above); all other models' rows are unchanged.
 - Raw `.eval` logs: `logs/patched-judge/` in this repo (20 files: 10 models × 2 tasks, kept
   separate from the original raw logs in `logs/` -- same behavior_ids, different judge code,
-  different live completions). Claude Sonnet 5's v1-patched logs are superseded by
-  `logs/patched-judge-v2/` but kept for traceability.
-- Patched scorer source: `analysis/patched-scorer/scorer.py` (v1); `analysis/patched-scorer-v2/scorer.py`
-  is what actually produced Claude Sonnet 5's numbers above.
+  different live completions). Claude Sonnet 5's v1- and v2-patched logs are superseded by
+  `logs/patched-judge-v3/` but kept for traceability.
+- Patched scorer source: `analysis/patched-scorer/scorer.py` (v1), `analysis/patched-scorer-v2/scorer.py`
+  (v2); `analysis/patched-scorer-v3/scorer.py` is what actually produced Claude Sonnet 5's numbers
+  above.
 - Hedgerow evaluation records, all 10 models pushed under experiment names clearly suffixed
   `-patched-judge` (distinct from each model's original, unpatched experiment):
-  - `claude-sonnet-5-patched-judge-v2` (current): harmful `1b249c57daa52242`, benign
-    `d91f29b7dc4a5f3e`. `claude-sonnet-5-patched-judge` (v1, superseded): harmful
-    `830ac18b8b4da51a`, benign `d3df2cc7bc411f60`
+  - `claude-sonnet-5-patched-judge-v3` (current): harmful `7966b1ec71b605ab`, benign
+    `ab0f5e985ed61bc6`. `claude-sonnet-5-patched-judge-v2` (superseded): harmful
+    `1b249c57daa52242`, benign `d91f29b7dc4a5f3e`. `claude-sonnet-5-patched-judge` (v1,
+    superseded): harmful `830ac18b8b4da51a`, benign `d3df2cc7bc411f60`
   - `gemini-2.5-pro-patched-judge`: harmful `1a4f467de4f87398`, benign `2674ab46d6aa3e33`
   - `gemini-2.5-flash-lite-patched-judge`: harmful `73992527e50a3a5f`, benign `375b8e55bc891a1d`
   - remaining seven models (Base Qwen3-14B, Qwen3-14B SFT-v4/v5/GRPO-v3, GPT-4o, GPT-4o-mini,
