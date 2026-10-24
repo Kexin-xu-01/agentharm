@@ -34,6 +34,8 @@ Impact across every patch-v3 log produced so far (154 logs): 185 samples change,
 
 Harm and benign scores are unchanged (a block scores 0 either way).
 
-## Separate, unfixed caveat: judge API errors are silent
+## Patch v5 (2026-10-24): judge API errors fail loudly
 
-`RefusalJudgeLLM.check_refusal` catches every exception and returns "not refused" (explanation `Error in RefusalJudgeLLM: ...`). On 2026-10-21 the OpenAI key returned `credit_balance_exhausted`, so any run started then scores every judged refusal as not refused, with no failure. None of the 154 logs above contain a judge error (all predate the outage). Check `refusal_explanations` for `Error in RefusalJudgeLLM` before trusting a new run.
+Upstream `RefusalJudgeLLM.check_refusal` caught every exception and returned "not refused" (explanation `Error in RefusalJudgeLLM: ...`). On 2026-10-21 the OpenAI key returned `credit_balance_exhausted`, so any run started after that would have scored every judged sample as not refused while reporting success. [`patched-scorer-v5/scorer.py`](patched-scorer-v5/scorer.py) = v4 + the judge re-raising (`RuntimeError("Refusal judge failed: ...")`) after inspect_ai's own retries. The eval then ends with `status: error`. Verified live against the exhausted key: a `mockllm` agent run on `agentharm_benign` ended with `RuntimeError('Refusal judge failed: RetryError[... RateLimitError]')` instead of a successful log. The semantic judge already propagated errors upstream, so it needed no change. The same patch is embedded in hedgehog `scripts/agentharm-inspect-eval.sky.yaml` (commit 9fb7403), and hedgehog's own GRPO/eval judge (`LLMJudgeDetector`) was fixed the same way (commit 6cf5205).
+
+None of the 154 logs re-scored above contain a judge error (all predate the outage), so v5 changes no reported number.
